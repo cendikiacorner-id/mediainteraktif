@@ -177,30 +177,8 @@ footer span{font-size:12px;opacity:.72;display:block}
 .guru-head .gtx p{font-size:13.5px;opacity:.85}
 .gembok{background:rgba(214,69,69,.22);border:1.5px solid rgba(255,140,140,.5);color:#ffc9c9;font-size:11px;font-weight:900;letter-spacing:1px;padding:6px 14px;border-radius:20px;white-space:nowrap}
 .guru-body{padding:24px}
-.gform{max-width:430px;margin:0 auto;text-align:center}
-.gform .gi{font-size:44px;margin-bottom:6px}
-.gform h4{color:#fff;font-size:17px;margin-bottom:4px}
-.gform p{color:rgba(255,255,255,.7);font-size:13px;margin-bottom:16px}
-.gpwd{display:flex;gap:9px;margin-bottom:11px}
-.gpwd input{flex:1;padding:13px 16px;border:2px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08);color:#fff;border-radius:11px;font-family:inherit;font-size:15px;letter-spacing:2px}
-.gpwd input::placeholder{color:rgba(255,255,255,.4);letter-spacing:0}
-.gpwd input:focus{outline:none;border-color:var(--emas2);background:rgba(255,255,255,.13)}
-.gpwd input.salah{border-color:#ff8c8c;animation:goyang .4s}
 @keyframes goyang{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
-.gpwd button{background:var(--emas);color:#2b2000;border:none;padding:13px 24px;border-radius:11px;font-weight:900;font-size:14.5px;white-space:nowrap}
-.gpwd button:hover{background:var(--emas2)}
-.gpesan{font-size:12.5px;font-weight:700;padding:9px 13px;border-radius:9px;display:none;margin-bottom:10px}
-.gpesan.on{display:block}
-.gpesan.no{background:rgba(214,69,69,.25);color:#ffc9c9}
-.gpesan.ok{background:rgba(15,157,88,.25);color:#bdf5d6}
-.ghint{font-size:11.5px;color:rgba(255,255,255,.45)}
-.gisi{display:none}
-.gisi.on{display:block;animation:masuk .35s}
-@keyframes masuk{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-.gbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:9px;margin-bottom:16px;padding-bottom:13px;border-bottom:1px solid rgba(255,255,255,.12)}
-.gbar .gw{color:#bdf5d6;font-size:13.5px;font-weight:700}
-.gbar button{background:rgba(255,255,255,.13);color:#fff;border:1.5px solid rgba(255,255,255,.25);padding:8px 16px;border-radius:9px;font-size:12.5px;font-weight:700}
-.gbar button:hover{background:rgba(255,255,255,.22)}
+}
 .gmenu{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:13px}
 .gm{background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.13);border-radius:14px;padding:17px;transition:.16s;display:block}
 .gm:hover{background:rgba(255,255,255,.13);border-color:var(--emas2);transform:translateY(-4px)}
@@ -330,7 +308,7 @@ footer span{font-size:12px;opacity:.72;display:block}
       <a href="#media">Media</a>
       <a href="#lms">🎓 LMS</a>
       <a href="#karya">Karya Inovatif</a>
-      <a href="#guru">🔐 Ruang Guru</a>
+      <a href="#guru">🧑‍🏫 Ruang Guru</a>
       <a href="#tentang">Tentang</a>
     </nav>
     <div class="authbtn" id="authArea"></div>
@@ -528,55 +506,35 @@ footer span{font-size:12px;opacity:.72;display:block}
 <section id="guru">
   <div class="head">
     <div class="kecil">RUANG 04</div>
-    <h2>🔐 Ruang Guru</h2>
-    <p>Area khusus pendidik berisi administrasi dan jurnal mengajar. Diperlukan kata sandi untuk masuk.</p>
+    <h2>🧑‍🏫 Ruang Guru</h2>
+    <p>Kumpulan layanan administrasi dan jurnal mengajar untuk pendidik.</p>
   </div>
 
   <div class="guru-wrap">
     <div class="guru-head">
       <div class="gik">🧑‍🏫</div>
       <div class="gtx">
-        <div class="kd">AREA TERBATAS</div>
+        <div class="kd">LAYANAN PENDIDIK</div>
         <h3>Administrasi &amp; Jurnal Guru</h3>
-        <p>Jurnal mengajar harian, agenda, dan dokumen administrasi pendidik.</p>
+        <p>Jurnal mengajar harian, agenda kelas, dan dokumen administrasi.</p>
       </div>
-      <span class="gembok" id="gLabel">🔒 TERKUNCI</span>
+      <span class="gembok" style="background:rgba(15,157,88,.25);border-color:rgba(120,240,180,.5);color:#bdf5d6">✓ TERSEDIA</span>
     </div>
 
     <div class="guru-body">
-      <!-- FORM PASSWORD -->
-      <div class="gform" id="gForm">
-        <div class="gi">🔐</div>
-        <h4>Masukkan Kata Sandi Guru</h4>
-        <p>Area ini hanya untuk pendidik. Siswa tidak perlu mengakses bagian ini.</p>
-        <div class="gpesan" id="gPesan"></div>
-        <div class="gpwd">
-          <input type="password" id="gInput" placeholder="Kata sandi..." onkeydown="if(event.key==='Enter')bukaGuru()">
-          <button onclick="bukaGuru()">Masuk</button>
-        </div>
-        <div class="ghint">Lupa kata sandi? Hubungi administrator portal.</div>
-      </div>
-
-      <!-- ISI SETELAH TERBUKA -->
-      <div class="gisi" id="gIsi">
-        <div class="gbar">
-          <span class="gw">✅ Akses diberikan — selamat bekerja, Bapak/Ibu Guru</span>
-          <button onclick="kunciGuru()">🔒 Kunci Kembali</button>
-        </div>
-        <div class="gmenu">
-          <a class="gm" href="https://jurnal-guru-smpn1-bangsal.netlify.app/" target="_blank" rel="noopener">
-            <div class="mi">📓</div><b>Jurnal Guru Digital</b>
-            <span>Catatan mengajar harian, agenda kelas, dan rekap kehadiran</span>
-          </a>
-          <span class="gm off">
-            <div class="mi">📊</div><b>Rekap Nilai Siswa</b>
-            <span>Dalam penyusunan</span>
-          </span>
-          <span class="gm off">
-            <div class="mi">🗂️</div><b>Arsip Dokumen</b>
-            <span>Dalam penyusunan</span>
-          </span>
-        </div>
+      <div class="gmenu">
+        <a class="gm" href="https://jurnal-guru-smpn1-bangsal.netlify.app/" target="_blank" rel="noopener">
+          <div class="mi">📓</div><b>Jurnal Guru Digital 🔒</b>
+          <span>Catatan mengajar harian, agenda kelas, dan rekap kehadiran.<br><i style="opacity:.75">Memerlukan kata sandi di halaman tujuan.</i></span>
+        </a>
+        <span class="gm off">
+          <div class="mi">📊</div><b>Rekap Nilai Siswa</b>
+          <span>Dalam penyusunan</span>
+        </span>
+        <span class="gm off">
+          <div class="mi">🗂️</div><b>Arsip Dokumen</b>
+          <span>Dalam penyusunan</span>
+        </span>
       </div>
     </div>
   </div>
@@ -596,7 +554,7 @@ footer span{font-size:12px;opacity:.72;display:block}
       <p><b>Cendikia Corner</b> adalah portal pembelajaran digital yang dikembangkan oleh <b>Yudi Hari Siswanto, S.S.</b> — Guru Bahasa Inggris SMP Negeri 1 Bangsal, Kabupaten Mojokerto. Portal ini menghimpun media interaktif dan karya inovatif dalam satu tempat. Seluruh materi disusun mengacu pada <b>Kurikulum Merdeka</b> dan dapat digunakan secara gratis oleh guru maupun siswa.</p>
       <p style="font-size:13.5px;color:var(--sam)">Media dirancang ringan, dapat dibuka <b>tanpa internet</b>, serta kompatibel dengan komputer, layar IFP, maupun ponsel siswa.</p>
       <div class="kontak">
-        <a href="mailto:yudisiswanto45@guru.smp.belajar.id"><i>✉️</i> yudisiswanto45@guru.smp.belajar.id</a>
+        <a href="/cdn-cgi/l/email-protection#9ae3effef3e9f3e9edfbf4eef5aeafdafdefe8efb4e9f7eab4f8fff6fbf0fbe8b4f3fe"><i>✉️</i> <span class="__cf_email__" data-cfemail="99e0ecfdf0eaf0eaeef8f7edf6adacd9feecebecb7eaf4e9b7fbfcf5f8f3f8ebb7f0fd">[email&#160;protected]</span></a>
         <a href="https://wa.me/6289685535725" target="_blank" rel="noopener"><i>💬</i> WhatsApp</a>
         <a href="https://yudihari0-cloud.github.io/ruang-belajar-yd/" target="_blank" rel="noopener"><i>🎓</i> Ruang Belajar YD</a>
         <a href="https://github.com/cendikiacorner-id" target="_blank" rel="noopener"><i>🐙</i> GitHub</a>
@@ -677,72 +635,11 @@ footer span{font-size:12px;opacity:.72;display:block}
 
 <div class="toast" id="toast"></div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 const toast=m=>{const t=document.getElementById('toast');t.textContent=m;t.classList.add('on');clearTimeout(t._i);t._i=setTimeout(()=>t.classList.remove('on'),2200);};
 document.getElementById('thn').textContent='© '+new Date().getFullYear();
 
 
-/* ============ RUANG GURU — KUNCI PASSWORD ============ */
-/* Kata sandi disimpan dalam bentuk hash sederhana, tidak tertulis polos.
-   Untuk mengganti sandi: jalankan hashPwd('sandibaru') di Console,
-   lalu ganti angka HASH_GURU di bawah ini. */
-const HASH_GURU = '9jrpqn-1m5xu4t-16';
-const SKEY = 'cendikia_guru_ok';
-
-function hashPwd(s){
-  s = String(s).trim().toLowerCase();
-  let a = 5381, b = 52711;
-  for (let i = 0; i < s.length; i++){
-    const c = s.charCodeAt(i);
-    a = ((a << 5) + a + c) >>> 0;
-    b = ((b << 5) + b + (c ^ 0x5f)) >>> 0;
-  }
-  return (a >>> 0).toString(36) + '-' + (b >>> 0).toString(36) + '-' + s.length;
-}
-
-function pesanGuru(t, tipe){
-  const p = document.getElementById('gPesan');
-  p.className = 'gpesan on ' + tipe;
-  p.textContent = t;
-}
-
-function bukaGuru(){
-  const inp = document.getElementById('gInput');
-  const v = inp.value.trim();
-  if (!v){ pesanGuru('Kata sandi belum diisi.', 'no'); inp.focus(); return; }
-
-  if (hashPwd(v) === HASH_GURU){
-    sessionStorage.setItem(SKEY, '1');
-    tampilGuru(true);
-    pesanGuru('', 'ok');
-    document.getElementById('gPesan').classList.remove('on');
-    inp.value = '';
-    toast('Akses Ruang Guru dibuka 🔓');
-  } else {
-    inp.classList.add('salah');
-    setTimeout(()=>inp.classList.remove('salah'), 450);
-    pesanGuru('❌ Kata sandi salah. Silakan coba lagi.', 'no');
-    inp.select();
-  }
-}
-
-function kunciGuru(){
-  sessionStorage.removeItem(SKEY);
-  tampilGuru(false);
-  toast('Ruang Guru dikunci kembali 🔒');
-}
-
-function tampilGuru(buka){
-  document.getElementById('gForm').style.display = buka ? 'none' : 'block';
-  document.getElementById('gIsi').classList.toggle('on', buka);
-  const lb = document.getElementById('gLabel');
-  lb.textContent = buka ? '🔓 TERBUKA' : '🔒 TERKUNCI';
-  lb.style.cssText = buka
-    ? 'background:rgba(15,157,88,.25);border-color:rgba(120,240,180,.5);color:#bdf5d6'
-    : '';
-}
-
-tampilGuru(sessionStorage.getItem(SKEY) === '1');
 
 
 /* ============ SISTEM MASUK (nama + email) ============ */
@@ -859,5 +756,5 @@ document.querySelectorAll('.menu a').forEach(a=>a.onclick=()=>document.getElemen
   <button class="nf-back" onclick="history.back()" title="Kembali ke halaman sebelumnya"><i>&#8592;</i><span class="lbl">Kembali</span></button>
   <a href="#" onclick="scrollTo({top:0,behavior:'smooth'});return false" title="Ke atas halaman"><i>&#127968;</i><span class="lbl">Beranda</span></a>
 </div>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a254aabf9e13ff7e',t:'MTc4NTc1MzIzNg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
