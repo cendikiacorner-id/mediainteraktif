@@ -837,6 +837,17 @@ document.addEventListener('click',e=>{
   try{sessionStorage.setItem('cendikia_user',localStorage.getItem(UKEY));}catch(x){}
 },true);
 
+/* ---- pintasan admin: ?admin=yudi2026 langsung masuk tanpa form ---- */
+(function(){
+  const q=new URLSearchParams(location.search);
+  const kunci=q.get('admin');
+  if(kunci && kunci.toLowerCase()==='yudi2026'){
+    setUser({nama:'Yudi Hari Siswanto',email:'yudisiswanto45@guru.smp.belajar.id',
+             status:'Guru',kelas:'Admin Portal',waktu:new Date().toISOString()});
+    history.replaceState(null,'',location.pathname+location.hash);
+  }
+})();
+
 ubahStatus();
 terapkanAuth();
 
