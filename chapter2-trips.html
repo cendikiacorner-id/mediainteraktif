@@ -109,6 +109,20 @@ textarea{width:100%;min-height:130px;border:2px solid #d7e0f2;border-radius:11px
 textarea:focus{outline:none;border-color:var(--biru2)}
 @media(max-width:700px){.dragwrap{grid-template-columns:1fr}header h1{font-size:14px}header p{display:none}nav{top:64px}}
 @media print{nav,header .skor,.brs,.spk{display:none}.page{display:block!important}}
+
+/* ==== NAVIGASI MELAYANG ==== */
+#navFloat{position:fixed;left:14px;bottom:14px;z-index:9999;display:flex;gap:8px;font-family:'Segoe UI',system-ui,Roboto,sans-serif}
+#navFloat a,#navFloat button{display:flex;align-items:center;gap:7px;background:#0d3b66;color:#fff;border:none;
+ padding:11px 16px;border-radius:30px;font-size:13.5px;font-weight:700;cursor:pointer;text-decoration:none;
+ box-shadow:0 4px 16px rgba(0,0,0,.3);transition:.15s;font-family:inherit;line-height:1}
+#navFloat a:hover,#navFloat button:hover{background:#1257a0;transform:translateY(-3px);box-shadow:0 7px 20px rgba(0,0,0,.35)}
+#navFloat .nf-back{background:#fff;color:#0d3b66;border:2px solid #0d3b66}
+#navFloat .nf-back:hover{background:#eef3fb;color:#0d3b66}
+#navFloat i{font-style:normal;font-size:15px}
+@media(max-width:620px){#navFloat{left:10px;bottom:10px;gap:6px}
+ #navFloat a,#navFloat button{padding:10px 13px;font-size:12.5px}
+ #navFloat .lbl{display:none}}
+@media print{#navFloat{display:none}}
 </style>
 </head>
 <body>
@@ -568,6 +582,21 @@ function ulangQuiz(){JAWAB={};buatQuiz();document.getElementById('boxHasil').sty
   document.getElementById('p-quiz').scrollIntoView({behavior:'smooth'});toast('Quiz direset. Semangat! 💪');}
 buatQuiz();updSkor();
 if('speechSynthesis'in window)speechSynthesis.onvoiceschanged=()=>{};
+
+/* ---- isi otomatis identitas dari portal ---- */
+(function(){
+  try{
+    const u=JSON.parse(sessionStorage.getItem('cendikia_user')||localStorage.getItem('cendikia_user'));
+    if(!u)return;
+    ['nmSiswa','wNama','pNama'].forEach(id=>{const e=document.getElementById(id);if(e&&!e.value)e.value=u.nama;});
+    ['klSiswa','wKelas','pKelas'].forEach(id=>{const e=document.getElementById(id);if(e&&!e.value)e.value=u.kelas||'';});
+  }catch(e){}
+})();
 </script>
+
+<div id="navFloat">
+  <button class="nf-back" onclick="if(history.length>1){history.back()}else{location.href='index.html'}" title="Kembali ke halaman sebelumnya"><i>&#8592;</i><span class="lbl">Kembali</span></button>
+  <a href="index.html" title="Beranda Cendikia Corner"><i>&#127968;</i><span class="lbl">Beranda</span></a>
+</div>
 </body>
 </html>

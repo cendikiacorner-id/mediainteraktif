@@ -704,6 +704,16 @@ function selesaiPAS(auto){
 
 updSkor();
 if('speechSynthesis'in window)speechSynthesis.onvoiceschanged=()=>{};
+
+/* ---- isi otomatis identitas dari portal ---- */
+(function(){
+  try{
+    const u=JSON.parse(sessionStorage.getItem('cendikia_user')||localStorage.getItem('cendikia_user'));
+    if(!u)return;
+    ['nmSiswa','wNama','pNama'].forEach(id=>{const e=document.getElementById(id);if(e&&!e.value)e.value=u.nama;});
+    ['klSiswa','wKelas','pKelas'].forEach(id=>{const e=document.getElementById(id);if(e&&!e.value)e.value=u.kelas||'';});
+  }catch(e){}
+})();
 </script>
 </body>
 </html>
