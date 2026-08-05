@@ -125,6 +125,20 @@ textarea:focus{outline:none;border-color:var(--biru2)}
 @media(max-width:620px){#navFloat{left:10px;bottom:10px}#navFloat .lbl{display:none}}
 @media(max-width:700px){.dragwrap{grid-template-columns:1fr}header h1{font-size:14px}header p{display:none}nav{top:64px}}
 @media print{nav,header .skor,.brs,.spk,#navFloat{display:none}.page{display:block!important}}
+
+.kirimNilai{background:linear-gradient(135deg,#0d3b66,#1257a0);border-radius:14px;padding:16px;margin-top:16px;color:#fff;text-align:left}
+.kirimNilai h4{color:#fff;font-size:15px;margin:0 0 4px}
+.kirimNilai p{font-size:12.5px;opacity:.9;margin-bottom:11px}
+.kirimNilai .brs2{display:flex;gap:9px;flex-wrap:wrap;align-items:center}
+.kirimNilai button{padding:11px 20px;border-radius:10px;font-weight:800;font-size:14px;border:none;cursor:pointer}
+.kn-go{background:#c9a227;color:#2b2000}
+.kn-go:hover{background:#f0c94a}
+.kn-go:disabled{opacity:.55;cursor:wait}
+.kn-st{font-size:12.5px;font-weight:700;padding:8px 13px;border-radius:9px;display:none}
+.kn-st.on{display:block}
+.kn-st.ok{background:rgba(15,157,88,.35);color:#bdf5d6}
+.kn-st.no{background:rgba(214,69,69,.35);color:#ffc9c9}
+.kn-st.wait{background:rgba(255,255,255,.2);color:#fff}
 </style>
 </head>
 <body>
@@ -608,7 +622,7 @@ function finish(){
   document.getElementById('hPredikat').textContent=pr[0];
   document.getElementById('hNama').textContent=nm+' — Kelas '+kl+' • '+new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'});
   document.getElementById('hRekap').innerHTML=[['Benar',b],['Salah',QZ.length-b],['Total Soal',QZ.length],['Poin Belajar',POIN]].map(x=>`<div><b>${x[1]}</b><span>${x[0]}</span></div>`).join('');
-  document.getElementById('hPesan').textContent=pr[1];
+  document.getElementById('hPesan').innerHTML=esc2(pr[1])+kotakKirim(b,QZ.length-b,QZ.length,n);
   document.getElementById('boxHasil').scrollIntoView({behavior:'smooth'});}
 function ulangQuiz(){JAWAB={};buatQuiz();document.getElementById('boxHasil').style.display='none';
   document.getElementById('p-quiz').scrollIntoView({behavior:'smooth'});toast('Quiz direset. Semangat! 💪');}
@@ -624,6 +638,66 @@ if('speechSynthesis'in window)speechSynthesis.onvoiceschanged=()=>{};
     ['klSiswa','wKelas','pKelas'].forEach(id=>{const e=document.getElementById(id);if(e&&!e.value)e.value=u.kelas||'';});
   }catch(e){}
 })();
+
+function esc2(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]));}
+/* ============ KIRIM NILAI KE GOOGLE SHEETS ============ */
+/* Tempelkan URL Web App Apps Script di bawah ini.
+   Kosongkan ('') bila fitur ini belum dipakai. */
+const URL_NILAI = 'https://script.google.com/macros/s/AKfycbwEDBaYFOMrj3cazQGruvMb6-zr7w2JaJdfkRqXz1yDVNA8vOcI2ed9ohecO1wuC2WV/exec';
+const MATERI_INI = 'Chapter 4 - Upcycling Used Materials';
+
+function kotakKirim(benar,salah,total,nilai,durasi){
+  if(!URL_NILAI) return '';
+  window.__hasil={benar:benar,salah:salah,total:total,nilai:nilai,durasi:durasi||'-'};
+  return `<div class="kirimNilai">
+      <h4>📤 Kirim Nilai ke Guru</h4>
+      <p>Pastikan nama dan kelas sudah benar, lalu kirim hasilnya.</p>
+      <div class="kn-st" id="knSt"></div>
+      <div class="brs2"><button class="kn-go" id="knBtn" onclick="kirimNilai()">📤 Kirim Nilai</button></div>
+    </div>`;
+}
+function knPesan(t,tipe){
+  const e=document.getElementById('knSt'); if(!e)return;
+  e.className='kn-st on '+tipe; e.innerHTML=t;
+}
+function kirimNilai(){
+  const h=window.__hasil; if(!h){return;}
+  const eN=document.getElementById('qNama')||document.getElementById('nmSiswa')||document.getElementById('pNama');
+  const eK=document.getElementById('qKelas')||document.getElementById('klSiswa')||document.getElementById('pKelas');
+  const nama=(eN&&eN.value.trim())||'';
+  const kelas=(eK&&eK.value.trim())||'';
+  if(nama.length<3){knPesan('❌ Nama belum diisi dengan benar.','no');if(eN)eN.focus();return;}
+
+  const btn=document.getElementById('knBtn');
+  btn.disabled=true; knPesan('⏳ Mengirim nilai...','wait');
+
+  const data={aksi:'nilai',nama:nama,kelas:kelas||'-',materi:MATERI_INI,jenis:'Final Quiz',
+    benar:h.benar,salah:h.salah,total:h.total,nilai:h.nilai,durasi:h.durasi};
+
+  if(location.protocol==='file:'){ knForm(data); return; }
+
+  fetch(URL_NILAI,{method:'POST',mode:'no-cors',
+    headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body:JSON.stringify(data)})
+  .then(()=>knSukses()).catch(()=>knForm(data));
+}
+function knForm(data){
+  ['knFrm','knIfr'].forEach(id=>{const x=document.getElementById(id);if(x)x.remove();});
+  const ifr=document.createElement('iframe');
+  ifr.name='knIfr'; ifr.id='knIfr'; ifr.style.display='none';
+  document.body.appendChild(ifr);
+  const f=document.createElement('form');
+  f.id='knFrm'; f.method='POST'; f.action=URL_NILAI; f.target='knIfr'; f.style.display='none';
+  const t=document.createElement('textarea'); t.name='payload'; t.value=JSON.stringify(data);
+  f.appendChild(t); document.body.appendChild(f); f.submit();
+  setTimeout(knSukses,2500);
+}
+function knSukses(){
+  const btn=document.getElementById('knBtn');
+  if(btn){btn.disabled=true;btn.textContent='✅ Sudah Terkirim';}
+  knPesan('✅ Nilai berhasil dikirim ke guru. Terima kasih!','ok');
+  if(typeof toast==='function')toast('Nilai terkirim 🎉');
+}
 </script>
 </body>
 </html>
