@@ -313,6 +313,7 @@ textarea:focus{outline:none;border-color:var(--biru)}
   <button data-p="tugas">📝 Tugas</button>
   <button data-p="nilai">📊 Nilai</button>
   <button data-p="rapor">🎓 Rapor</button>
+  <button data-p="lms">🎒 LMS Siswa</button>
   <button data-p="sync">☁️ Sinkronisasi</button>
   <button data-p="atur">⚙️ Pengaturan</button>
 </nav>
@@ -480,10 +481,12 @@ textarea:focus{outline:none;border-color:var(--biru)}
 
     <div class="barform">
       <span style="font-weight:700;font-size:13.5px">Semester:</span>
-      <select id="nlSem" onchange="renderNilai()">
+      <select id="nlSem" onchange="isiChapter();renderNilai()">
         <option value="1">Semester 1 (Ganjil)</option>
         <option value="2">Semester 2 (Genap)</option>
       </select>
+      <span style="font-weight:700;font-size:13.5px" id="lblChap">Chapter:</span>
+      <select id="nlChap" onchange="renderNilai()"></select>
     </div>
 
     <div class="subtab" id="subNilai">
@@ -519,6 +522,23 @@ textarea:focus{outline:none;border-color:var(--biru)}
 </section>
 
 <!-- ============ SINKRONISASI ============ -->
+<!-- ============ LMS SISWA ============ -->
+<div class="page" id="p-lms">
+  <div class="kartu">
+    <h2>🎒 Pantauan LMS Siswa</h2>
+    <p class="ket">Data absensi dan poin yang dikirim siswa dari halaman <b>Ruang Belajar YD</b>.
+       Sumber data: spreadsheet <b>Nilai Kuis Siswa</b> (sheet <i>Absensi LMS</i> &amp; <i>Poin LMS</i>).</p>
+    <div class="brs" style="margin-top:10px">
+      <button class="btn b-ut" onclick="ambilLMS()">🔄 Muat Data LMS</button>
+      <button class="btn b-gh" onclick="unduhLMS()">⬇️ Unduh CSV</button>
+    </div>
+    <div class="info i-b" id="infoLMS" style="margin-top:12px">
+      Klik <b>Muat Data LMS</b> untuk menarik data terbaru dari Google Sheets.
+    </div>
+    <div id="tabelLMS" style="margin-top:14px"></div>
+  </div>
+</div>
+
 <section class="page" id="p-sync">
   <div class="sync-box">
     <h3>☁️ Sinkronisasi Google Sheets</h3>
@@ -687,10 +707,59 @@ function go(p){document.querySelectorAll('nav button').forEach(b=>b.classList.to
   if(p==='tugas')renderTugas();
   if(p==='nilai')renderNilai();
   if(p==='rapor')renderRapor();
+  if(p==='lms')renderLMS();
   if(p==='sync')renderSync();
   if(p==='atur')renderAtur();
   if(p==='home')renderHome();}
 document.querySelectorAll('nav button[data-p]').forEach(b=>b.onclick=()=>go(b.dataset.p));
+
+
+/* ================= LMS SISWA ================= */
+const URL_LMS='https://script.google.com/macros/s/AKfycbwEDBaYFOMrj3cazQGruvMb6-zr7w2JaJdfkRqXz1yDVNA8vOcI2ed9ohecO1wuC2WV/exec';
+let DATA_LMS=[];
+function renderLMS(){renderKelasBar();if(DATA_LMS.length)tampilLMS();}
+function ambilLMS(){
+  const info=document.getElementById('infoLMS');
+  info.innerHTML='⏳ Memuat data dari Google Sheets…';
+  const cb='lms_'+Math.random().toString(36).slice(2,9);
+  const sc=document.createElement('script');let kelar=false;
+  window[cb]=function(r){kelar=true;
+    DATA_LMS=(r&&r.data)||[];
+    info.innerHTML=DATA_LMS.length
+      ?`✅ Terbaca <b>${DATA_LMS.length}</b> siswa. Diperbarui ${new Date().toLocaleTimeString('id-ID')}.`
+      :'⚠️ Belum ada data. Pastikan siswa sudah absen lewat LMS dan Apps Script sudah diperbarui.';
+    tampilLMS();bersih();};
+  function bersih(){try{delete window[cb]}catch(e){window[cb]=undefined}
+    if(sc.parentNode)sc.parentNode.removeChild(sc);clearTimeout(jam);}
+  const jam=setTimeout(()=>{if(!kelar){bersih();
+    info.innerHTML='❌ Gagal memuat. Periksa koneksi, atau pastikan Apps Script sudah di-deploy versi baru.';}},15000);
+  sc.onerror=()=>{if(!kelar){bersih();info.innerHTML='❌ Gagal memuat data.';}};
+  sc.src=URL_LMS+'?aksi=papan&kelas=&callback='+cb;
+  document.body.appendChild(sc);}
+function tampilLMS(){
+  const box=document.getElementById('tabelLMS');
+  const d=DATA_LMS.filter(x=>!DB.aktif||x.kelas===DB.aktif);
+  if(!d.length){box.innerHTML='<div class="kosong">Belum ada data LMS untuk kelas '+esc(DB.aktif)+'.</div>';return;}
+  const medali=['🥇','🥈','🥉'];
+  box.innerHTML=`<div class="wrap-tbl"><table class="tbl"><thead><tr>
+    <th class="no">#</th><th>Nama Siswa</th><th>Kelas</th>
+    <th class="gF">Hadir</th><th class="gF">Tuntas</th><th class="gR">Poin</th></tr></thead><tbody>
+    ${d.map((x,i)=>`<tr${i<3?' style="background:#fff8e1"':''}>
+      <td class="no">${i<3?medali[i]:i+1}</td>
+      <td style="min-width:150px">${esc(x.nama)}</td>
+      <td>${esc(x.kelas)}</td>
+      <td>${x.hadir}</td><td>${x.tuntas}</td>
+      <td><b class="nilaiakhir">${x.poin}</b></td></tr>`).join('')}
+    </tbody></table></div>
+    <p style="font-size:12.5px;color:var(--sam);margin-top:8px">
+    🏆 Tiga teratas berhak menerima medali dan sertifikat penghargaan akhir semester.</p>`;}
+function unduhLMS(){
+  if(!DATA_LMS.length){toast('Muat data dulu');return;}
+  let c='Peringkat;Nama;Kelas;Hadir;Tuntas;Poin\n';
+  DATA_LMS.forEach((x,i)=>{c+=[i+1,x.nama,x.kelas,x.hadir,x.tuntas,x.poin].join(';')+'\n';});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob(["\ufeff"+c],{type:'text/csv;charset=utf-8'}));
+  a.download='LMS-Poin-Siswa.csv';a.click();toast('CSV diunduh');}
 
 /* ================= KELAS ================= */
 function renderKelasBar(){
@@ -894,10 +963,45 @@ function renderTugas(){
    :'<div class="kosong">Belum ada tugas pada kategori ini.<br>Tambahkan tugas melalui kolom di atas 👆</div>';}
 
 /* ================= NILAI (KURIKULUM MERDEKA) ================= */
+/* Chapter per semester (bisa diubah di sini bila kurikulum berubah) */
+const CHAPTER={
+  '1':[['c1','Chapter 1'],['c2','Chapter 2'],['c3','Chapter 3']],
+  '2':[['c4','Chapter 4'],['c5','Chapter 5']]
+};
+function chapAktif(){
+  const sem=document.getElementById('nlSem');
+  const el=document.getElementById('nlChap');
+  const list=CHAPTER[sem?sem.value:'1']||CHAPTER['1'];
+  if(el&&el.value&&list.some(c=>c[0]===el.value))return el.value;
+  return list[0][0];}
+function isiChapter(){
+  const sem=document.getElementById('nlSem').value;
+  const el=document.getElementById('nlChap');
+  const list=CHAPTER[sem]||CHAPTER['1'];
+  const lama=el.value;
+  el.innerHTML=list.map(c=>`<option value="${c[0]}">${c[1]}</option>`).join('');
+  if(list.some(c=>c[0]===lama))el.value=lama;}
+
+/* Kolom HARIAN: per unit 2 penilaian -> kunci: c1u1n1 dst */
+function kolHarian(c){
+  const o=[];
+  for(let u=1;u<=3;u++)for(let n=1;n<=2;n++)
+    o.push([`${c}u${u}n${n}`,`U${u}·NH${n}`]);
+  return o;}
+/* Kolom TUGAS & PROJECT: per chapter */
+function kolTP(c){
+  return [[`${c}t1`,'Tugas 1'],[`${c}t2`,'Tugas 2'],[`${c}p1`,'Project']];}
+/* Semua kunci formatif dari SELURUH chapter (dipakai untuk hitung rata-rata) */
+function semuaKunciF(){
+  const o=[];
+  Object.values(CHAPTER).flat().forEach(c=>{
+    kolHarian(c[0]).forEach(k=>o.push(k));
+    kolTP(c[0]).forEach(k=>o.push(k));});
+  return o;}
+/* Kunci lama (data sebelum revisi) tetap dihitung agar nilai tidak hilang */
+const KUNCI_LAMA=['h1','h2','h3','t1','t2','t3','p1','p2','p3'];
+
 const KOLOM={
-  F:[['h1','Harian 1'],['h2','Harian 2'],['h3','Harian 3'],
-     ['t1','Tugas 1'],['t2','Tugas 2'],['t3','Tugas 3'],
-     ['p1','Project 1'],['p2','Project 2'],['p3','Project 3']],
   S:[['u1','UH 1'],['u2','UH 2'],['u3','UH 3'],['pts','PTS'],['pas','PAS']]
 };
 let SUBNILAI='F';
@@ -913,6 +1017,9 @@ function baris(sem,id){
   return n.data[id];}
 function setSubNilai(s,el){SUBNILAI=s;
   document.querySelectorAll('#subNilai button').forEach(b=>b.classList.toggle('on',b.dataset.s===s));
+  const tampil=(s==='F')?'':'none';
+  const a=document.getElementById('nlChap'),b=document.getElementById('lblChap');
+  if(a)a.style.display=tampil; if(b)b.style.display=tampil;
   renderNilai();}
 function setNilai(id,kunci,v){
   const sem=document.getElementById('nlSem').value,d=baris(sem,id);
@@ -922,7 +1029,9 @@ function setNilai(id,kunci,v){
 function rata(arr){const v=(arr||[]).filter(x=>x!==''&&x!=null&&!isNaN(x));
   return v.length?v.reduce((a,b)=>a+Number(b),0)/v.length:0;}
 function nFormatif(d){
-  return rata(KOLOM.F.map(k=>d?d[k[0]]:''));}
+  if(!d)return 0;
+  const kunci=[...semuaKunciF().map(k=>k[0]),...KUNCI_LAMA];
+  return rata(kunci.map(k=>d[k]));}
 function nSumatif(d){
   const st=DB.setting;
   const uh=rata([d&&d.u1,d&&d.u2,d&&d.u3]);
@@ -948,6 +1057,8 @@ function perbaruiBaris(id){
 
 function renderNilai(){
   renderKelasBar();
+  { const el=document.getElementById('nlChap');
+    if(el&&!el.options.length)isiChapter(); }
   const st=DB.setting;
   document.getElementById('infoBobot').innerHTML=
     `<b>⚖️ Bobot yang digunakan:</b> Formatif <b>${st.bF}%</b> · Sumatif <b>${st.bS}%</b>
@@ -974,7 +1085,8 @@ function renderNilai(){
         Nilai Akhir = (Formatif × ${st.bF}%) + (Sumatif × ${st.bS}%)</p>`;
     return;}
 
-  const kol=KOLOM[SUBNILAI];
+  const c=chapAktif();
+  const kol=SUBNILAI==='F'?[...kolHarian(c),...kolTP(c)]:KOLOM.S;
   const cls=SUBNILAI==='F'?'gF':'gS';
   let th=`<th class="no">No</th><th>Nama Siswa</th>`;
   kol.forEach(k=>th+=`<th class="${cls}">${k[1]}</th>`);
@@ -986,7 +1098,7 @@ function renderNilai(){
       const d=n.data[s.id]||{};
       let td=`<td class="no">${i+1}</td><td style="min-width:150px">${esc(s.nama)}</td>`;
       kol.forEach((k,idx)=>{
-        const sep=(SUBNILAI==='F'&&(idx===3||idx===6))||(SUBNILAI==='S'&&idx===3)?' class="sep"':'';
+        const sep=(SUBNILAI==='F'&&(idx===2||idx===4||idx===6))||(SUBNILAI==='S'&&idx===3)?' class="sep"':'';
         td+=`<td${sep}><input type="number" min="0" max="100" value="${d[k[0]]!=null?d[k[0]]:''}" oninput="setNilai('${s.id}','${k[0]}',this.value)"></td>`;});
       td+=SUBNILAI==='F'
         ? `<td><b id="rf-${s.id}" style="color:#0f9d58">${Math.round(nFormatif(d))||''}</b></td>`
@@ -996,14 +1108,14 @@ function renderNilai(){
       return '<tr>'+td+'</tr>';}).join('')}
     </tbody></table></div>
     <p style="font-size:12.5px;color:var(--sam);margin-top:8px">
-      ${SUBNILAI==='F'?'🌱 <b>Formatif</b> = rata-rata dari Harian, Tugas, dan Project.'
+      ${SUBNILAI==='F'?'🌱 <b>Formatif</b> = rata-rata SELURUH nilai harian, tugas, dan project dari semua chapter. <b>U1·NH1</b> = Unit 1, Nilai Harian 1.'
         :`🎯 <b>Sumatif</b> = (rata UH × ${st.bUH}%) + (PTS × ${st.bPTS}%) + (PAS × ${st.bPAS}%).`}
       Nilai tersimpan otomatis saat diketik. Rentang 0–100.</p>`;}
 
 function unduhNilai(){
   const sem=document.getElementById('nlSem').value,n=getNilai(sem),sw=siswaKelas();
   if(!sw.length){toast('Belum ada data siswa');return;}
-  const semua=[...KOLOM.F,...KOLOM.S];
+  const semua=[...semuaKunciF(),...KOLOM.S];
   let c='No;Nama;'+semua.map(k=>k[1]).join(';')+';Formatif;Sumatif;NilaiAkhir;Predikat;Status\n';
   sw.forEach((s,i)=>{
     const d=n.data[s.id]||{},na=nilaiAkhir(d),pr=predikat(na);
